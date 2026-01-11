@@ -1,0 +1,110 @@
+{% extends 'admin/master.html'%}
+{% block page_title %}
+   Admin | Product
+{% endblock %}
+{% block content %}
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="m-0">Add Product Page</h1>
+          </div><!-- /.col -->
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="{{ url_for('product')}}">Home</a></li>
+              <li class="breadcrumb-item active">Product Page</li>
+            </ol>
+          </div><!-- /.col -->
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content-header -->
+
+ <!-- Main content -->
+    <div class="content">
+      <div class="container-fluid">
+               <!-- Small boxes (Stat box) -->
+        <div class="card">
+            <div class="card-header">
+              <a href="{{ url_for('product')}}" class="btn btn-outline-secondary">
+                  <i class="fas fa-arrow-left"></i>Back</a>
+                <h1>{{status}}</h1>
+
+              <div class="card-body">
+                  <form>
+                      <!-- name-->
+                      <div class="mb-3">
+                        <label for="name" >Name(*)</label>
+                        <input type="text"
+                               class="form-control"
+                               id="name">
+
+                      </div>
+                      <!-- category-->
+                      <div class="mb-3">
+                        <label for="category" >Category</label>
+                          <select
+                               class="form-control"
+                               id="category">
+                              <option value="drink">Drink</option>
+                              <option value="food">Food</option>
+                          </select>
+
+
+                      </div>
+                      <!-- cost-->
+                      <div class="mb-3">
+                        <label for="cost" >Cost(*)</label>
+                          <input  type="number"
+                                   class="form-control"
+                                   id="cost"
+                                   value="0">
+
+
+
+                      </div>
+                      <!-- price-->
+                      <div class="mb-3">
+                        <label for="price" >Price(*)</label>
+                          <input  type="number"
+                                   class="form-control"
+                                   id="price"
+                                   value="0">
+
+                      </div>
+                      <!-- description-->
+                      <div class="mb-3">
+                        <label for="description" >Description</label>
+                          <textarea
+                                    class="form-control"
+                                    id="description"></textarea>
+
+                      </div>
+
+                      <button type="reset"
+                              class="btn btn-danger"
+                      >Cancel</button>
+                      {% if status=='add'%}
+                           <button type="submit"
+                                  class="btn btn-primary"
+                          >Save</button>
+                      {% endif %}
+
+                      {% if status=='edit'%}
+                           <button type="submit"
+                                  class="btn btn-primary"
+                          >Save</button>
+                      {% endif %}
+
+                  </form>
+              </div>
+              </div>
+            </div>
+      </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content -->
+  </div>
+{% endblock %}
+
