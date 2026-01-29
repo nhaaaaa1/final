@@ -1,0 +1,432 @@
+{% extends 'base.html' %}
+
+{% block title %}Products{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+  <!-- Page Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="h3 mb-2 text-gray-800">
+        {% if category_name %}
+          <i class="fas fa-folder-open text-primary mr-2"></i>Products in "{{ category_name }}"
+        {% else %}
+          <i class="fas fa-boxes text-primary mr-2"></i>All Products
+        {% endif %}
+      </h1>
+      <p class="mb-0">
+        {% if category_name %}
+          Showing products from {{ category_name }} category
+        {% else %}
+          Browse all available products in our store
+        {% endif %}
+      </p>
+    </div>
+    <div class="d-flex">
+      <div class="dropdown mr-2">
+        <button class="btn btn-outline-primary dropdown-toggle" type="button" id="sortDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <i class="fas fa-sort-amount-down"></i> Sort By
+        </button>
+        <div class="dropdown-menu" aria-labelledby="sortDropdown">
+          <a class="dropdown-item" href="#"><i class="fas fa-sort-alpha-down"></i> Name A-Z</a>
+          <a class="dropdown-item" href="#"><i class="fas fa-sort-alpha-up"></i> Name Z-A</a>
+          <a class="dropdown-item" href="#"><i class="fas fa-sort-numeric-down"></i> Price: Low to High</a>
+          <a class="dropdown-item" href="#"><i class="fas fa-sort-numeric-up"></i> Price: High to Low</a>
+          <a class="dropdown-item" href="#"><i class="fas fa-calendar-alt"></i> Newest First</a>
+        </div>
+      </div>
+      <button class="btn btn-primary" data-toggle="modal" data-target="#filterModal">
+        <i class="fas fa-filter"></i> Filter
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card border-left-primary shadow h-100 py-2">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                Total Products
+              </div>
+              <div class="h5 mb-0 font-weight-bold text-gray-800">{{ products|length }}</div>
+            </div>
+            <div class="col-auto">
+              <i class="fas fa-box fa-2x text-gray-300"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card border-left-success shadow h-100 py-2">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                Average Price
+              </div>
+              <div class="h5 mb-0 font-weight-bold text-gray-800">
+                ${{ "%.2f"|format(products|sum(attribute='price') / products|length if products|length > 0 else 0) }}
+              </div>
+            </div>
+            <div class="col-auto">
+              <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% if products %}
+  <!-- Products Grid -->
+  <div class="row">
+    {% for product in products %}
+    <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
+      <div class="card product-card shadow-sm h-100 border-0">
+        <!-- Product Badge -->
+        {% if product.price < 50 %}
+        <div class="product-badge badge badge-success">
+          <i class="fas fa-bolt"></i> Best Deal
+        </div>
+        {% elif product.price > 200 %}
+        <div class="product-badge badge badge-warning">
+          <i class="fas fa-crown"></i> Premium
+        </div>
+        {% endif %}
+
+        <!-- Product Image -->
+        <div class="product-image-container">
+          {% if product.image %}
+          <img src="{{ url_for('static', filename='uploads/' + product.image) }}"
+               class="card-img-top product-image"
+               alt="{{ product.name }}"
+               onerror="this.onerror=null; this.src='{{ url_for('static', filename='uploads/default.png') }}'">
+          {% else %}
+          <img src="{{ url_for('static', filename='uploads/default.png') }}"
+               class="card-img-top product-image"
+               alt="{{ product.name }}">
+          {% endif %}
+          <div class="product-overlay">
+            <button class="btn btn-outline-light btn-sm quick-view" data-id="{{ product.id }}">
+              <i class="fas fa-eye"></i> Quick View
+            </button>
+          </div>
+        </div>
+
+        <!-- Card Body -->
+        <div class="card-body d-flex flex-column">
+          <!-- Category Tag -->
+          <div class="mb-2">
+            <span class="badge badge-info">
+              <i class="fas fa-tag"></i> {{ product.category.name if product.category else 'Uncategorized' }}
+            </span>
+          </div>
+
+          <!-- Product Name -->
+          <h5 class="card-title font-weight-bold text-dark mb-2 product-name">
+            {{ product.name|truncate(40) }}
+          </h5>
+
+          <!-- Product Description -->
+          <p class="card-text text-muted small mb-3 flex-grow-1">
+            {% if product.description %}
+              {{ product.description|truncate(100) }}
+            {% else %}
+              No description available
+            {% endif %}
+          </p>
+
+          <!-- Price and Actions -->
+          <div class="d-flex justify-content-between align-items-center mt-auto">
+            <div>
+              <span class="h4 font-weight-bold text-primary mb-0">${{ "%.2f"|format(product.price) }}</span>
+              {% if product.old_price and product.old_price > product.price %}
+              <small class="text-muted ml-2"><s>${{ "%.2f"|format(product.old_price) }}</s></small>
+              {% endif %}
+            </div>
+            <div class="btn-group" role="group">
+              <button class="btn btn-outline-primary btn-sm add-to-cart" data-id="{{ product.id }}">
+                <i class="fas fa-cart-plus"></i>
+              </button>
+              <button class="btn btn-primary btn-sm view-details" data-id="{{ product.id }}">
+                <i class="fas fa-info-circle"></i> Details
+              </button>
+              <button class="btn btn-outline-danger btn-sm add-to-wishlist" data-id="{{ product.id }}">
+                <i class="far fa-heart"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Stock Status -->
+          <div class="mt-3">
+            {% if product.stock and product.stock > 0 %}
+              {% if product.stock <= 10 %}
+              <small class="text-warning">
+                <i class="fas fa-exclamation-triangle"></i> Only {{ product.stock }} left in stock!
+              </small>
+              {% else %}
+              <small class="text-success">
+                <i class="fas fa-check-circle"></i> In Stock
+              </small>
+              {% endif %}
+            {% else %}
+              <small class="text-danger">
+                <i class="fas fa-times-circle"></i> Out of Stock
+              </small>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Pagination -->
+  <nav aria-label="Page navigation" class="mt-4">
+    <ul class="pagination justify-content-center">
+      <li class="page-item disabled">
+        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">
+          <i class="fas fa-chevron-left"></i>
+        </a>
+      </li>
+      <li class="page-item active"><a class="page-link" href="#">1</a></li>
+      <li class="page-item"><a class="page-link" href="#">2</a></li>
+      <li class="page-item"><a class="page-link" href="#">3</a></li>
+      <li class="page-item">
+        <a class="page-link" href="#">
+          <i class="fas fa-chevron-right"></i>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  {% else %}
+  <!-- Empty State -->
+  <div class="text-center py-5">
+    <div class="empty-state-icon mb-4">
+      <i class="fas fa-box-open fa-4x text-gray-300"></i>
+    </div>
+    <h3 class="text-gray-800 font-weight-bold mb-3">No Products Found</h3>
+    <p class="text-muted mb-4">
+      {% if category_name %}
+        There are no products available in the "{{ category_name }}" category.
+      {% else %}
+        No products are currently available in our store.
+      {% endif %}
+    </p>
+    <a href="{{ url_for('products', category='all') }}" class="btn btn-primary">
+      <i class="fas fa-sync-alt mr-2"></i>View All Products
+    </a>
+  </div>
+  {% endif %}
+</div>
+
+<!-- Quick View Modal -->
+<div class="modal fade" id="quickViewModal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <!-- Content will be loaded dynamically -->
+    </div>
+  </div>
+</div>
+
+<style>
+.product-card {
+  transition: all 0.3s ease;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+
+.product-card .product-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  padding: 5px 10px;
+  border-radius: 4px;
+}
+
+.product-image-container {
+  position: relative;
+  overflow: hidden;
+  height: 200px;
+  background: #f8f9fa;
+}
+
+.product-image {
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.product-card:hover .product-image {
+  transform: scale(1.05);
+}
+
+.product-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.product-card:hover .product-overlay {
+  opacity: 1;
+}
+
+.product-overlay .btn {
+  transition: transform 0.3s ease;
+}
+
+.product-overlay .btn:hover {
+  transform: scale(1.1);
+}
+
+.product-name {
+  min-height: 48px;
+}
+
+.card-body {
+  padding: 1.25rem;
+}
+
+.btn-group .btn {
+  border-radius: 4px !important;
+  margin: 0 2px;
+}
+
+.empty-state-icon {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.border-left-primary {
+  border-left: 4px solid #4e73df !important;
+}
+
+.border-left-success {
+  border-left: 4px solid #1cc88a !important;
+}
+
+.shadow-sm {
+  box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075) !important;
+}
+
+.shadow {
+  box-shadow: 0 0.15rem 1.75rem 0 rgba(58,59,69,0.15) !important;
+}
+</style>
+
+<script>
+$(document).ready(function() {
+  // Quick view functionality
+  $('.quick-view').click(function() {
+    const productId = $(this).data('id');
+    $('#quickViewModal').modal('show');
+    // Here you would typically load product details via AJAX
+  });
+
+  // Add to cart functionality
+  $('.add-to-cart').click(function() {
+    const productId = $(this).data('id');
+    const button = $(this);
+
+    button.html('<i class="fas fa-spinner fa-spin"></i>');
+    button.prop('disabled', true);
+
+    // Simulate API call
+    setTimeout(() => {
+      button.html('<i class="fas fa-check"></i>');
+      button.removeClass('btn-outline-primary').addClass('btn-success');
+
+      // Show success message
+      showToast('Product added to cart successfully!', 'success');
+
+      // Reset button after 2 seconds
+      setTimeout(() => {
+        button.html('<i class="fas fa-cart-plus"></i>');
+        button.removeClass('btn-success').addClass('btn-outline-primary');
+        button.prop('disabled', false);
+      }, 2000);
+    }, 1000);
+  });
+
+  // Add to wishlist functionality
+  $('.add-to-wishlist').click(function() {
+    const button = $(this);
+    const icon = button.find('i');
+
+    if (icon.hasClass('far')) {
+      icon.removeClass('far').addClass('fas');
+      button.removeClass('btn-outline-danger').addClass('btn-danger');
+      showToast('Added to wishlist!', 'success');
+    } else {
+      icon.removeClass('fas').addClass('far');
+      button.removeClass('btn-danger').addClass('btn-outline-danger');
+      showToast('Removed from wishlist!', 'info');
+    }
+  });
+
+  // View details functionality
+  $('.view-details').click(function() {
+    const productId = $(this).data('id');
+    // Navigate to product detail page
+    window.location.href = `/products/${productId}`;
+  });
+
+  // Toast notification function
+  function showToast(message, type = 'info') {
+    // Create toast element
+    const toast = $(`
+      <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-delay="3000">
+        <div class="toast-header">
+          <strong class="mr-auto">Notification</strong>
+          <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="toast-body">
+          ${message}
+        </div>
+      </div>
+    `);
+
+    // Add to container and show
+    $('#toastContainer').append(toast);
+    toast.toast('show');
+
+    // Remove after hiding
+    toast.on('hidden.bs.toast', function() {
+      $(this).remove();
+    });
+  }
+
+  // Create toast container if not exists
+  if (!$('#toastContainer').length) {
+    $('body').append('<div id="toastContainer" class="toast-container position-fixed bottom-0 end-0 p-3"></div>');
+  }
+});
+</script>
+{% endblock %}

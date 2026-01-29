@@ -17,6 +17,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
   <!-- Theme style -->
   <link rel="stylesheet" href="{{ url_for('static', filename='admin/dist/css/adminlte.min.css')}}">
+<!-- main.css -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='admin/main.css')}}">
 </head>
 <body class="hold-transition sidebar-mini">
 <div class="wrapper">
@@ -40,7 +42,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <ul class="navbar-nav ml-auto">
       <!-- Navbar Search -->
 
-
       <!-- Messages Dropdown Menu -->
 
       <!-- Notifications Dropdown Menu -->
@@ -53,6 +54,13 @@ scratch. This page gets rid of all links and provides the needed markup only.
       <li class="nav-item">
         <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button">
           <i class="fas fa-th-large"></i>
+        </a>
+      </li>
+      <!-- Logout Button in Navbar -->
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('logout') }}" role="button" title="Logout">
+          <i class="fas fa-sign-out-alt"></i>
+          <span class="d-none d-sm-inline">Logout</span>
         </a>
       </li>
     </ul>
@@ -93,7 +101,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
           </li>
           <!-- /.category -->
           <li class="nav-item">
-            <a href="#" class="nav-link">
+            <a href="{{ url_for('category')}}" class="nav-link">
               <i class="nav-icon fas fa-cubes"></i>
               <p>Category</p>
             </a>
@@ -114,9 +122,17 @@ scratch. This page gets rid of all links and provides the needed markup only.
           </li>
           <!-- /.user -->
           <li class="nav-item">
-            <a href="#" class="nav-link">
+            <a href="{{ url_for('user')}}" class="nav-link">
               <i class="nav-icon fab fa-keybase"></i>
               <p>User</p>
+            </a>
+          </li>
+
+          <!-- Logout Button in Sidebar -->
+          <li class="nav-item">
+            <a href="{{ url_for('logout') }}" class="nav-link">
+              <i class="nav-icon fas fa-sign-out-alt text-danger"></i>
+              <p class="text-danger">Logout</p>
             </a>
           </li>
 

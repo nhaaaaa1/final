@@ -28,8 +28,10 @@
                <!-- Small boxes (Stat box) -->
         <div class="card">
             <div class="card-header">
-              <a href="{{ url_for('add_product' ,action='add')}}" class="btn btn-outline-primary">
-                  <i class="fas fa-plus-circle"></i>Add</a>
+              <a href="{{ url_for('form_product',action='add')}}" class="btn btn-outline-primary">
+                  <i class="fas fa-plus-circle"></i>
+                  Add
+              </a>
 
               <div class="card-body">
                 <div class="table-responsive">
@@ -46,19 +48,38 @@
                     </tr>
                     </thead>
                       <tbody>
-                        <tr>
-                          <td>1</td>
-                          <td>Image.png</td>
-                          <td>Coca</td>
-                          <td>Drink</td>
-                          <td>0.5$</td>
-                          <td>1.5$</td>
+                      {% for product in products %}
+                         <tr>
+                          <td>{{ loop.index }}</td>
                           <td>
+                                <img
+                                    src="{{ url_for('static', filename='uploads/' ~ (product.image or 'img.png')) }}"
+                                    style="width:50px;height:50px;object-fit:contain;"
+                                >
+                          </td>
 
-                              <a href="{{ url_for('add_product' ,action='edit',pro_id=1)}}" class="btn btn-sm btn-outline-secondary"><i class="fas fa-user-edit"></i>Edit</a>
-                              <a href="{{ url_for('add_product' ,action='add')}}" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash-alt"></i>Delete</a>
+
+
+                          <td>{{ product.name }}</td>
+                          <td>{{ product.category}}</td>
+                          <td>{{ product.cost }}$</td>
+                          <td>{{ product.price }}$</td>
+                          <td>
+                              <a href="{{ url_for('form_product',action='edit', pro_id=product.id)}}"
+                                 class="btn btn-sm btn-outline-secondary"
+                              >
+                                  <i class="fas fa-user-edit"></i>
+                                  Edit
+                              </a>
+                              <a
+                                      class="btn btn-sm btn-outline-danger"
+                                        href="{{ url_for('confirm_product', pro_id=product.id)}}">
+                                  <i class="fas fa-trash-alt"></i>
+                                  Delete
+                              </a>
                           </td>
                         </tr>
+                      {% endfor %}
                       </tbody>
                   </table>
                 </div>

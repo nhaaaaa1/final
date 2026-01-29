@@ -1,110 +1,127 @@
-{% extends 'admin/master.html'%}
+{% extends 'admin/master.html' %}
+
 {% block page_title %}
-   Admin | Product
+Admin | Product
 {% endblock %}
+
 {% block content %}
 <div class="content-wrapper">
-    <!-- Content Header (Page header) -->
-    <div class="content-header">
-      <div class="container-fluid">
-        <div class="row mb-2">
-          <div class="col-sm-6">
-            <h1 class="m-0">Add Product Page</h1>
-          </div><!-- /.col -->
-          <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="{{ url_for('product')}}">Home</a></li>
-              <li class="breadcrumb-item active">Product Page</li>
-            </ol>
-          </div><!-- /.col -->
-        </div><!-- /.row -->
-      </div><!-- /.container-fluid -->
+
+  <div class="content-header">
+    <div class="container-fluid">
+      <h1 class="m-0">
+        {{ 'Add Product' if status == 'add' else 'Edit Product' }}
+      </h1>
     </div>
-    <!-- /.content-header -->
-
- <!-- Main content -->
-    <div class="content">
-      <div class="container-fluid">
-               <!-- Small boxes (Stat box) -->
-        <div class="card">
-            <div class="card-header">
-              <a href="{{ url_for('product')}}" class="btn btn-outline-secondary">
-                  <i class="fas fa-arrow-left"></i>Back</a>
-                <h1>{{status}}</h1>
-
-              <div class="card-body">
-                  <form>
-                      <!-- name-->
-                      <div class="mb-3">
-                        <label for="name" >Name(*)</label>
-                        <input type="text"
-                               class="form-control"
-                               id="name">
-
-                      </div>
-                      <!-- category-->
-                      <div class="mb-3">
-                        <label for="category" >Category</label>
-                          <select
-                               class="form-control"
-                               id="category">
-                              <option value="drink">Drink</option>
-                              <option value="food">Food</option>
-                          </select>
-
-
-                      </div>
-                      <!-- cost-->
-                      <div class="mb-3">
-                        <label for="cost" >Cost(*)</label>
-                          <input  type="number"
-                                   class="form-control"
-                                   id="cost"
-                                   value="0">
-
-
-
-                      </div>
-                      <!-- price-->
-                      <div class="mb-3">
-                        <label for="price" >Price(*)</label>
-                          <input  type="number"
-                                   class="form-control"
-                                   id="price"
-                                   value="0">
-
-                      </div>
-                      <!-- description-->
-                      <div class="mb-3">
-                        <label for="description" >Description</label>
-                          <textarea
-                                    class="form-control"
-                                    id="description"></textarea>
-
-                      </div>
-
-                      <button type="reset"
-                              class="btn btn-danger"
-                      >Cancel</button>
-                      {% if status=='add'%}
-                           <button type="submit"
-                                  class="btn btn-primary"
-                          >Save</button>
-                      {% endif %}
-
-                      {% if status=='edit'%}
-                           <button type="submit"
-                                  class="btn btn-primary"
-                          >Save</button>
-                      {% endif %}
-
-                  </form>
-              </div>
-              </div>
-            </div>
-      </div><!-- /.container-fluid -->
-    </div>
-    <!-- /.content -->
   </div>
-{% endblock %}
 
+  <div class="content">
+    <div class="container-fluid">
+      <div class="card">
+
+        <div class="card-header">
+          <a href="{{ url_for('product') }}"
+             class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Back
+          </a>
+        </div>
+
+        <div class="card-body">
+
+          <form method="post" enctype="multipart/form-data" action="{{ url_for('add_product') if status == 'add' else url_for('edit_product') }}">
+
+
+            {% if status == 'edit' %}
+                <input type="hidden" name="product_id" value="{{ product.id }}">
+            {% endif %}
+
+            <!-- Image display -->
+            <div class="mb-3 text-center">
+                <img
+                    src="{{ url_for('static', filename='uploads/' ~ (product.image if product and product.image else 'img.png')) }}"
+                    style="width:150px;height:150px;object-fit:contain;border:1px solid #ccc;"
+                >
+            </div>
+
+            <!-- Image upload -->
+            <div class="mb-3">
+                <label>Image</label>
+                <input type="file"
+                       name="image"
+                       class="form-control"
+                       accept="image/*">
+            </div>
+
+
+
+            <!-- NAME -->
+            <div class="mb-3">
+              <label>Name *</label>
+              <input type="text"
+                     name="name"
+                     class="form-control"
+                     value="{{ product.name if product else '' }}"
+                     required>
+            </div>
+
+            <!-- CATEGORY -->
+            <div class="mb-3">
+              <label>Category</label>
+              <select name="category" class="form-control" required>
+                {% for item in category %}
+                  <option value="{{ item.id }}"
+                    {% if product and product.category_id == item.id %}
+                      selected
+                    {% endif %}
+                  >
+                    {{ item.name }}
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <!-- COST -->
+            <div class="mb-3">
+              <label>Cost *</label>
+              <input type="number"
+                     name="cost"
+                     class="form-control"
+                     value="{{ product.cost if product else 0 }}"
+                     required>
+            </div>
+
+            <!-- PRICE -->
+            <div class="mb-3">
+              <label>Price *</label>
+              <input type="number"
+                     name="price"
+                     class="form-control"
+                     value="{{ product.price if product else 0 }}"
+                     required>
+            </div>
+
+            <!-- DESCRIPTION -->
+            <div class="mb-3">
+              <label>Description</label>
+              <textarea name="description"
+                        class="form-control"
+                        rows="3">{{ product.description if product else '' }}</textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+              {{ 'Save' if status == 'add' else 'Update' }}
+            </button>
+
+            <button type="reset" class="btn btn-danger">
+              Cancel
+            </button>
+
+          </form>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends 'admin/master.html'%}
+{% block page_title %}
+   Admin | Confirm Delete Product
+{% endblock %}
+{% block content %}
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="m-0"> Confirm Delete Page</h1>
+          </div><!-- /.col -->
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="{{ url_for('product')}}">Home</a></li>
+              <li class="breadcrumb-item active">Confirm Delete Page</li>
+            </ol>
+          </div><!-- /.col -->
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content-header -->
+
+ <!-- Main content -->
+    <div class="content">
+      <div class="container-fluid">
+               <!-- Small boxes (Stat box) -->
+        <div class="card">
+            <div class="card-header">
+              <a href="{{ url_for('product')}}" class="btn btn-outline-secondary">
+                  <i class="fab fa-product-hunt"></i>
+                  Back
+              </a>
+
+              <div class="card-body">
+                  <center>
+                      <h3>Do you want to delete ?</h3>
+                      <ul>
+
+                          <li>Name:{{ product.name }}</li>
+
+                      </ul>
+                  </center>
+                    <form method="post"
+                          action="{{ url_for('delete_product', pro_id=product.id) }}"
+                          onsubmit="return confirm('Delete product: {{ product.name }} ?');">
+                        <button type="submit" class="btn btn-danger btn-sm">
+                            Delete
+                        </button>
+                    </form>
+
+
+              </div>
+              </div>
+            </div>
+      </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content -->
+  </div>
+{% endblock %}
+
