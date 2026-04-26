@@ -3,19 +3,127 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>{% block title %}My Shop{% endblock %}</title>
+<title>{% block title %}Pink Store{% endblock %}</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+  :root {
+    --primary-pink: #ff69b4;
+    --light-pink: #ffb6c1;
+    --lighter-pink: #ffe4e1;
+    --dark-pink: #ff1493;
+    --soft-pink: #fff0f5;
+    --bg-light: #fff5f5;
+  }
+
+  body {
+    background: linear-gradient(135deg, var(--bg-light) 0%, #ffffff 100%);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  .navbar {
+    background: linear-gradient(135deg, var(--primary-pink), var(--light-pink)) !important;
+    box-shadow: 0 2px 15px rgba(255, 105, 180, 0.2);
+  }
+
+  .navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+  }
+
+  .navbar-brand i {
+    margin-right: 8px;
+  }
+
+  .nav-link {
+    color: rgba(255,255,255,0.9) !important;
+    transition: all 0.3s ease;
+  }
+
+  .nav-link:hover {
+    color: white !important;
+    transform: translateY(-2px);
+  }
+
+  .nav-link.active {
+    font-weight: bold;
+    color: #fff0f5 !important;
+  }
+
+  .btn-pink {
+    background: linear-gradient(135deg, var(--primary-pink), var(--light-pink));
+    border: none;
+    transition: transform 0.3s ease;
+    color: white;
+  }
+
+  .btn-pink:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 105, 180, 0.3);
+    color: white;
+  }
+
+  .btn-outline-pink {
+    border-color: var(--primary-pink);
+    color: var(--primary-pink);
+  }
+
+  .btn-outline-pink:hover {
+    background: linear-gradient(135deg, var(--primary-pink), var(--light-pink));
+    border-color: transparent;
+    color: white;
+  }
+
+  /* Scrollbar Styling */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--lighter-pink);
+    border-radius: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--primary-pink);
+    border-radius: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--dark-pink);
+  }
+</style>
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top">
   <div class="container">
-    <a class="navbar-brand" href="{{ url_for('front_home') }}">My Shop</a>
-    <div class="collapse navbar-collapse">
+    <a class="navbar-brand" href="{{ url_for('front_home') }}">
+      <i class="fas fa-heart"></i> Pink Store
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link {% if not selected_category %}active{% endif %}" href="{{ url_for('front_home') }}">
+            <i class="fas fa-th-large me-1"></i>All Products
+          </a>
+        </li>
         {% for cat in categories %}
         <li class="nav-item">
-          <a class="nav-link" href="{{ url_for('front_home', category_id=cat.id) }}">{{ cat.name }}</a>
+          <a class="nav-link {% if selected_category == cat.id %}active{% endif %}"
+             href="{{ url_for('front_home', category_id=cat.id) }}">
+            {% if cat.name == 'Drink' %}
+              <i class="fas fa-coffee me-1"></i>
+            {% elif cat.name == 'Food' %}
+              <i class="fas fa-utensils me-1"></i>
+            {% else %}
+              <i class="fas fa-box me-1"></i>
+            {% endif %}
+            {{ cat.name }}
+          </a>
         </li>
         {% endfor %}
       </ul>
@@ -23,9 +131,10 @@
   </div>
 </nav>
 
-<div class="container mt-4">
+<div class="container-fluid mt-4">
   {% block content %}{% endblock %}
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -38,7 +38,7 @@ Admin | Product
             <!-- Image display -->
             <div class="mb-3 text-center">
                 <img
-                    src="{{ url_for('static', filename='uploads/' ~ (product.image if product and product.image else 'img.png')) }}"
+                    src="{{ url_for('static', filename='uploads/' ~ (product.image if product and product.image else 'bank-qr.png')) }}"
                     style="width:150px;height:150px;object-fit:contain;border:1px solid #ccc;"
                 >
             </div>
