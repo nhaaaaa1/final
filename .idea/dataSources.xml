@@ -13,5 +13,17 @@
         </library>
       </libraries>
     </data-source>
+    <data-source source="LOCAL" name="ecommerce" uuid="c37cad93-2a3d-46b7-8095-65698f542eea">
+      <driver-ref>sqlite.xerial</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
+      <jdbc-url>jdbc:sqlite:C:\python\instance\ecommerce.db</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+      <libraries>
+        <library>
+          <url>file://$USER_HOME$/Downloads/sqlite-jdbc-3.14.2.jar</url>
+        </library>
+      </libraries>
+    </data-source>
   </component>
 </project>

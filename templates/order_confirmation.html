@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}Order Confirmation - Pink Store{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm text-center">
+                <div class="card-body p-5">
+                    <i class="fas fa-check-circle text-success fa-4x mb-3"></i>
+                    <h2 class="mb-3">Thank You for Your Order! 💕</h2>
+                    <p class="lead">Order #{{ order.order_number }}</p>
+                    <p>Grand Total: <strong class="text-pink fs-4">${{ "%.2f"|format(grand_total) }}</strong></p>
+
+                    <div class="alert alert-info mt-4">
+                        <i class="fas fa-qrcode me-2"></i>
+                        <strong>Complete Payment via KHQR (Bakong)</strong>
+                        <p class="mb-0 mt-2 small">Scan the QR code below using your Bakong app to complete payment</p>
+                    </div>
+
+                    <div class="qr-container my-4">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data={{ khqr_data|tojson|urlencode }}"
+                             alt="KHQR Code" class="img-fluid border p-3 rounded" style="max-width: 250px;">
+                        <p class="mt-2 text-muted small">Scan with Bakong app to pay</p>
+                    </div>
+
+                    <div class="payment-details mb-4 p-3 bg-light rounded">
+                        <h6>Payment Details:</h6>
+                        <p class="small mb-0">
+                            Amount: <strong>${{ "%.2f"|format(grand_total) }}</strong><br>
+                            Merchant: <strong>Pink Store</strong><br>
+                            Order ID: <strong>{{ order.order_number }}</strong>
+                        </p>
+                    </div>
+
+                    <button class="btn btn-success" id="confirmPaymentBtn">
+                        <i class="fas fa-check-circle me-2"></i>I Have Completed the Payment
+                    </button>
+
+                    <div id="paymentStatus" class="mt-3" style="display: none;">
+                        <div class="alert alert-info">
+                            <i class="fas fa-spinner fa-spin me-2"></i> Verifying payment...
+                        </div>
+                    </div>
+
+                    <div id="paymentSuccess" class="mt-3" style="display: none;">
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle me-2"></i> Payment confirmed! Redirecting...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('confirmPaymentBtn').addEventListener('click', async function() {
+        const btn = this;
+        const paymentStatus = document.getElementById('paymentStatus');
+        const paymentSuccess = document.getElementById('paymentSuccess');
+
+        btn.disabled = true;
+        paymentStatus.style.display = 'block';
+
+        try {
+            const response = await fetch('/confirm-payment/{{ order.order_number }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                paymentStatus.style.display = 'none';
+                paymentSuccess.style.display = 'block';
+
+                setTimeout(() => {
+                    window.location.href = '/order-success/{{ order.order_number }}';
+                }, 2000);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            paymentStatus.style.display = 'none';
+            alert('Error confirming payment. Please contact support.');
+            btn.disabled = false;
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}Order Success - Pink Store{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <div class="success-animation mb-4">
+                <i class="fas fa-check-circle text-success" style="font-size: 80px;"></i>
+            </div>
+            <h1 class="display-4 mb-3">Order Placed Successfully! 🎉</h1>
+            <p class="lead mb-4">Thank you for shopping at Pink Store! 💕</p>
+
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Order Details</h5>
+                    <p class="card-text">
+                        <strong>Order Number:</strong> {{ order.order_number }}<br>
+                        <strong>Grand Total:</strong> <span class="text-pink fs-5">${{ "%.2f"|format(order.grand_total) }}</span><br>
+                        <strong>Status:</strong> <span class="badge bg-success">{{ order.status|upper }}</span><br>
+                        <strong>Payment Status:</strong> <span class="badge bg-info">{{ order.payment_status|upper }}</span><br>
+                        <strong>Date:</strong> {{ order.created_at.strftime('%Y-%m-%d %H:%M:%S') }}
+                    </p>
+                </div>
+            </div>
+
+            <div class="alert alert-info">
+                <i class="fas fa-envelope me-2"></i>
+                A confirmation email has been sent to <strong>{{ order.customer_email }}</strong>
+            </div>
+
+            <div class="mt-4">
+                <a href="{{ url_for('shop') }}" class="btn btn-pink btn-lg me-2">
+                    <i class="fas fa-shopping-bag me-2"></i>Continue Shopping
+                </a>
+                <a href="{{ url_for('index') }}" class="btn btn-outline-pink btn-lg">
+                    <i class="fas fa-home me-2"></i>Go Home
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.success-animation {
+    animation: scaleIn 0.5s ease-in-out;
+}
+
+@keyframes scaleIn {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+</style>
+{% endblock %}

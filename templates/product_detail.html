@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ product.name }} - Pink Store{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('shop') }}">Shop</a></li>
+            {% if product.category %}
+            <li class="breadcrumb-item"><a href="{{ url_for('shop') }}?category={{ product.category.id }}">{{ product.category.name }}</a></li>
+            {% endif %}
+            <li class="breadcrumb-item active">{{ product.name }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <!-- Product Image -->
+        <div class="col-md-6 mb-4">
+            <div class="card border-0 shadow-sm">
+                <img src="{{ product.image_url }}" class="img-fluid rounded" alt="{{ product.name }}" style="border-radius: 20px;">
+            </div>
+        </div>
+
+        <!-- Product Info -->
+        <div class="col-md-6">
+            <h1 class="mb-3">{{ product.name }}</h1>
+
+            <div class="mb-3">
+                {% if product.compare_price %}
+                <span class="text-muted"><s>${{ "%.2f"|format(product.compare_price) }}</s></span>
+                {% endif %}
+                <span class="product-price display-6">${{ "%.2f"|format(product.price) }}</span>
+                {% if product.discount_percent > 0 %}
+                <span class="badge bg-danger ms-2">Save {{ product.discount_percent }}%</span>
+                {% endif %}
+            </div>
+
+            <div class="mb-4">
+                <div class="d-flex gap-2 mb-2">
+                    <i class="fas fa-star text-warning"></i>
+                    <i class="fas fa-star text-warning"></i>
+                    <i class="fas fa-star text-warning"></i>
+                    <i class="fas fa-star text-warning"></i>
+                    <i class="fas fa-star-half-alt text-warning"></i>
+                    <span class="text-muted">(24 reviews)</span>
+                </div>
+
+                <div class="mb-2">
+                    <strong>Availability:</strong>
+                    {% if product.stock > 0 %}
+                    <span class="text-success">In Stock ({{ product.stock }} available)</span>
+                    {% else %}
+                    <span class="text-danger">Out of Stock</span>
+                    {% endif %}
+                </div>
+
+                <div class="mb-2">
+                    <strong>SKU:</strong> <span class="text-muted">{{ product.sku or 'N/A' }}</span>
+                </div>
+
+                <div class="mb-2">
+                    <strong>Categories:</strong>
+                    <a href="{{ url_for('shop') }}?category={{ product.category_id }}" class="text-decoration-none">
+                        {{ product.category.name if product.category else 'Uncategorized' }}
+                    </a>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <h5>Description</h5>
+                <p>{{ product.description }}</p>
+            </div>
+
+            {% if product.tags %}
+            <div class="mb-4">
+                <strong>Tags:</strong>
+                {% for tag in product.tags.split(',') %}
+                <a href="{{ url_for('shop') }}?search={{ tag.strip() }}" class="badge bg-light text-dark text-decoration-none me-1">#{{ tag.strip() }}</a>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="d-flex gap-3 align-items-center mb-4">
+                <div class="input-group" style="width: 130px;">
+                    <button class="btn btn-outline-pink" id="decrementQty">-</button>
+                    <input type="number" id="quantity" class="form-control text-center" value="1" min="1" max="{{ product.stock }}">
+                    <button class="btn btn-outline-pink" id="incrementQty">+</button>
+                </div>
+                <button class="btn btn-pink flex-grow-1" onclick="addToCartWithQuantity()">
+                    <i class="fas fa-shopping-cart me-2"></i>Add to Cart
+                </button>
+                <button class="btn btn-outline-pink" onclick="addToWishlist()">
+                    <i class="far fa-heart"></i>
+                </button>
+            </div>
+
+            <div class="alert alert-info">
+                <i class="fas fa-truck me-2"></i> Free shipping on orders over $50!
+            </div>
+        </div>
+    </div>
+
+    <!-- Related Products -->
+    {% if related_products %}
+    <div class="mt-5">
+        <h3 class="mb-4">You May Also Like 💕</h3>
+        <div class="row g-4">
+            {% for product in related_products %}
+            <div class="col-md-3 col-sm-6">
+                <div class="product-card">
+                    <img src="{{ product.image_url }}" class="product-image" alt="{{ product.name }}">
+                    <div class="p-3">
+                        <h6 class="mb-2">{{ product.name }}</h6>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="product-price">${{ "%.2f"|format(product.price) }}</span>
+                            <button class="btn btn-pink btn-sm" onclick="addToCart({{ product.id }})">
+                                <i class="fas fa-cart-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    const quantityInput = document.getElementById('quantity');
+    const maxStock = {{ product.stock }};
+
+    document.getElementById('decrementQty')?.addEventListener('click', function() {
+        let value = parseInt(quantityInput.value);
+        if (value > 1) {
+            quantityInput.value = value - 1;
+        }
+    });
+
+    document.getElementById('incrementQty')?.addEventListener('click', function() {
+        let value = parseInt(quantityInput.value);
+        if (value < maxStock) {
+            quantityInput.value = value + 1;
+        } else {
+            showNotification('Maximum stock reached!', 'warning');
+        }
+    });
+
+    function addToCartWithQuantity() {
+        const quantity = parseInt(quantityInput.value);
+        addToCart({{ product.id }}, quantity);
+    }
+
+    function addToWishlist() {
+        showNotification('Added to wishlist! 💕', 'success');
+    }
+</script>
+{% endblock %}
